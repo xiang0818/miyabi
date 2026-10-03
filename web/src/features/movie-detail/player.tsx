@@ -18,7 +18,7 @@ export function MoviePlayer({ videos, title }: { videos: LocalVideo[]; title: st
         播放
       </Button>
       <DialogContent
-        className="dark flex h-[min(52rem,calc(100dvh-2rem))] w-[calc(100%-2rem)] max-w-6xl flex-col gap-0 overflow-hidden p-0"
+        className="dark flex h-[min(52rem,calc(100dvh-2rem))] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-6xl"
         onCloseAutoFocus={event => event.preventDefault()}
       >
         <DialogTitle className="sr-only">{title || current.name}</DialogTitle>
