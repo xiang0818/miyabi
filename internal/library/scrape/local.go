@@ -46,7 +46,7 @@ func (service *Service) commitLocal(ctx context.Context, fn func(*ent.Tx) error)
 
 func (service *Service) publishLocal(ctx context.Context, job tasks.Job, input Payload) error {
 	artwork := *input.Artwork
-	files, err := service.db.File.Query().Where(fileScope(input.Source), file.MovieIDEQ(input.MovieID)).All(ctx)
+	files, err := service.db.File.Query().Where(FileScope(input.Source), file.MovieIDEQ(input.MovieID)).All(ctx)
 	if err != nil {
 		return fmt.Errorf("load local movie files: %w", err)
 	}

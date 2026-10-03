@@ -137,10 +137,10 @@ func (service *Service) Close() {
 	service.subtitleQueue.Close()
 }
 
-// fileScope selects the indexed files a source owns. Local files share the
+// FileScope selects the indexed files a source owns. Local files share the
 // fixed local account and are not separated by root, matching the library
 // listing scope; remote sources keep account plus mounted root.
-func fileScope(source domain.LibrarySource) predicate.File {
+func FileScope(source domain.LibrarySource) predicate.File {
 	if source.AccountID == domain.LocalAccountID {
 		return file.AccountIDEQ(domain.LocalAccountID)
 	}
@@ -225,7 +225,7 @@ type txCommit func(context.Context, func(*ent.Tx) error) error
 
 func (service *Service) prepareMetadata(ctx context.Context, commit txCommit, taskID int, input *Payload) error {
 	record, err := service.db.Movie.Query().Where(movie.IDEQ(input.MovieID),
-		movie.HasFilesWith(fileScope(input.Source))).Only(ctx)
+		movie.HasFilesWith(FileScope(input.Source))).Only(ctx)
 	if err != nil {
 		return fmt.Errorf("load indexed movie for metadata: %w", err)
 	}
@@ -288,7 +288,7 @@ func (service *Service) Finished(ctx context.Context, tx *ent.Tx, job tasks.Job,
 	update := tx.Movie.Update().Where(
 		movie.IDEQ(input.MovieID),
 		movie.ManualCodeEQ(input.ManualCode),
-		movie.HasFilesWith(fileScope(input.Source)),
+		movie.HasFilesWith(FileScope(input.Source)),
 	)
 	if !input.Rebuild {
 		update.Where(movie.ScrapeStatusNEQ(movie.ScrapeStatusDone))

@@ -6,7 +6,6 @@ import (
 
 	"github.com/ppxb/miyabi/internal/domain"
 	"github.com/ppxb/miyabi/internal/ent"
-	"github.com/ppxb/miyabi/internal/ent/file"
 	"github.com/ppxb/miyabi/internal/ent/movie"
 	"github.com/ppxb/miyabi/internal/ent/task"
 	"github.com/ppxb/miyabi/internal/library/scrape"
@@ -19,7 +18,7 @@ import (
 // the media files.
 func EnqueueLocalScrapes(ctx context.Context, db *ent.Client, taskID int, source domain.LibrarySource) (int, error) {
 	records, err := db.Movie.Query().Where(
-		movie.HasFilesWith(file.AccountIDEQ(domain.LocalAccountID)),
+		movie.HasFilesWith(scrape.FileScope(source)),
 		movie.ScrapeStatusNEQ(movie.ScrapeStatusDone),
 	).Select(movie.FieldID, movie.FieldCode, movie.FieldManualCode).Order(movie.ByID()).All(ctx)
 	if err != nil {
