@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as PlayRouteImport } from './routes/play'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const DiscoverRoute = DiscoverRouteImport.update({
   id: '/discover',
   path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlayRoute = PlayRouteImport.update({
+  id: '/play',
+  path: '/play',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -50,6 +56,7 @@ const DiscoverSearchRoute = DiscoverSearchRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/discover': typeof DiscoverRoute
+  '/play': typeof PlayRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/subscriptions': typeof SubscriptionsRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/discover': typeof DiscoverRoute
+  '/play': typeof PlayRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/subscriptions': typeof SubscriptionsRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/discover': typeof DiscoverRoute
+  '/play': typeof PlayRoute
   '/search': typeof SearchRoute
   '/settings': typeof SettingsRoute
   '/subscriptions': typeof SubscriptionsRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/discover'
+    | '/play'
     | '/search'
     | '/settings'
     | '/subscriptions'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/discover'
+    | '/play'
     | '/search'
     | '/settings'
     | '/subscriptions'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/discover'
+    | '/play'
     | '/search'
     | '/settings'
     | '/subscriptions'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DiscoverRoute: typeof DiscoverRoute
+  PlayRoute: typeof PlayRoute
   SearchRoute: typeof SearchRoute
   SettingsRoute: typeof SettingsRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/discover'
       fullPath: '/discover'
       preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/play': {
+      id: '/play'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof PlayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DiscoverRoute: DiscoverRoute,
+  PlayRoute: PlayRoute,
   SearchRoute: SearchRoute,
   SettingsRoute: SettingsRoute,
   SubscriptionsRoute: SubscriptionsRoute,

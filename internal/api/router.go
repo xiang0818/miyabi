@@ -31,6 +31,7 @@ type Dependencies struct {
 	Monitor        SubscriptionManager
 	Library        LibraryManager
 	LocalPlay      LocalPlayer
+	Playables      PlayablesManager
 	LocalSources   LocalSourceManager
 	STRM           STRMRelay
 	Tasks          TaskManager
@@ -107,6 +108,7 @@ func NewRouter(deps Dependencies) *gin.Engine {
 	protected.GET("/library/artwork/:key", libraryArtworkHandler(deps.Artwork))
 	protected.GET("/local/play/:fileID", localPlayHandler(deps.LocalPlay))
 	protected.HEAD("/local/play/:fileID", localPlayHandler(deps.LocalPlay))
+	protected.GET("/playables", playablesHandler(deps.Playables))
 
 	protected.GET("/tasks", noStore(), tasksHandler(deps.Tasks))
 	protected.POST("/tasks/:id/retry", taskRetryHandler(deps.Tasks))

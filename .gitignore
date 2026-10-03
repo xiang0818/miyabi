@@ -27,6 +27,10 @@ config.local.*
 
 /.tmp/
 
+# Local references and visual drafts, not shipped.
+/player/
+/design/
+
 .idea/
 .vscode/
 *.swp
