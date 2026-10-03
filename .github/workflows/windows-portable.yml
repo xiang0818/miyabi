@@ -99,6 +99,8 @@ jobs:
 
           cp LICENSE "${stage}/"
           cp docs/portable-windows.md "${stage}/使用说明.md"
+          cp scripts/start-portable.bat "${stage}/启动.bat"
+          cp scripts/stop-portable.bat "${stage}/停止.bat"
           (cd dist && zip -qr "${package}.zip" "${package}")
 
       - name: Upload the package
@@ -151,6 +153,13 @@ jobs:
 
             if (-not (Test-Path (Join-Path $exe.DirectoryName 'miyabi.env'))) {
               throw 'the portable build did not generate miyabi.env next to the executable'
+            }
+
+            if (-not (Test-Path (Join-Path $exe.DirectoryName '启动.bat'))) {
+              throw 'the portable build is missing the start script'
+            }
+            if (-not (Test-Path (Join-Path $exe.DirectoryName '停止.bat'))) {
+              throw 'the portable build is missing the stop script'
             }
             Write-Host 'portable build serves the embedded UI and generated its configuration'
           } finally {
