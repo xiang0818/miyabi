@@ -70,8 +70,11 @@ func TestLocalSourceScanImportsConfiguredDirectory(t *testing.T) {
 	if count := lib.database.Movie.Query().CountX(ctx); count != 1 {
 		t.Fatalf("imported movies: %d", count)
 	}
-	if count := lib.database.Task.Query().CountX(ctx); count != 1 {
+	if count := lib.database.Task.Query().Where(task.TypeEQ(string(tasks.KindScan))).CountX(ctx); count != 1 {
 		t.Fatalf("queued scans: %d", count)
+	}
+	if count := lib.database.Task.Query().Where(task.TypeEQ(string(tasks.KindScrape))).CountX(ctx); count != 1 {
+		t.Fatalf("queued scrapes: %d", count)
 	}
 }
 

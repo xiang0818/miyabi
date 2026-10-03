@@ -99,7 +99,11 @@ go build -trimpath -ldflags "-s -w -H=windowsgui" -o miyabi.exe ./cmd/miyabi
 
 ### 发布
 
-推送 `v*.*.*` 标签时，GitHub Actions 会自动构建 `windows/amd64` 与 `windows/arm64` 两个 zip 并附加到对应的 Release 草稿上。
+Windows 便携版由独立工作流 `.github/workflows/windows-portable.yml` 构建，与 Docker 镜像的 `docker-publish.yml` 互不依赖：
+
+- 推送 `v*.*.*` 标签：自动构建 `windows/amd64` 与 `windows/arm64` 两个 zip，先在 `windows-latest` 上启动 amd64 包做冒烟验证（健康检查 + 首页返回），通过后再附加到同一个 Release 草稿上。
+- 手动触发（`workflow_dispatch`，无需打标签）：只产出可下载的 workflow artifact，用于验证构建，不修改任何 Release。
+- 两个工作流共用同一个 tag 触发，各自构建、各自上传；Release 草稿仍由 Docker 工作流创建。
 
 ## 与 Docker 部署的差异
 
