@@ -106,10 +106,19 @@ func (s *Service) scanLocal(ctx context.Context, id int, payload domain.ScanPayl
 	if err != nil {
 		return fmt.Errorf("scan local directory %s: %w", root, err)
 	}
+	// Local files without an NFO still need central metadata scraping.
+	queued, err := scan.EnqueueLocalScrapes(ctx, s.database, id, payload.Source)
+	if err != nil {
+		return err
+	}
+	if queued > 0 {
+		s.tasks.WakePool()
+	}
 	payload.Scan.Stage = "done"
 	payload.Scan.FilesScanned = result.FilesScanned
 	payload.Scan.VideoFiles = result.MediaFiles
 	payload.Scan.MatchedFiles = result.MediaFiles
 	payload.Scan.Movies = result.MoviesAdded
+	// Metadata progress folds the queued scrape children into this scan task.
 	return scan.ReportScan(ctx, s.database.Task, id, payload, s.tasks)
 }

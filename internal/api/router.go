@@ -30,6 +30,7 @@ type Dependencies struct {
 	Offline        OfflineManager
 	Monitor        SubscriptionManager
 	Library        LibraryManager
+	LocalPlay      LocalPlayer
 	LocalSources   LocalSourceManager
 	STRM           STRMRelay
 	Tasks          TaskManager
@@ -104,6 +105,8 @@ func NewRouter(deps Dependencies) *gin.Engine {
 	protected.POST("/library/local-scan", libraryLocalScanHandler(deps.Library))
 	protected.POST("/library/rebuild", libraryRebuildHandler(deps.Library))
 	protected.GET("/library/artwork/:key", libraryArtworkHandler(deps.Artwork))
+	protected.GET("/local/play/:fileID", localPlayHandler(deps.LocalPlay))
+	protected.HEAD("/local/play/:fileID", localPlayHandler(deps.LocalPlay))
 
 	protected.GET("/tasks", noStore(), tasksHandler(deps.Tasks))
 	protected.POST("/tasks/:id/retry", taskRetryHandler(deps.Tasks))
