@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 export function MoviePlayer({ videos, title }: { videos: LocalVideo[]; title: string }) {
   const [open, setOpen] = useState(false)
   const [index, setIndex] = useState(0)
-  if (videos.length === 0) return null
   const current = videos[Math.min(index, videos.length - 1)]
+  if (!current) return null
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
