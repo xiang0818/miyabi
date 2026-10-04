@@ -27,8 +27,6 @@
       this.hideDelay = options.hideDelay || 3200;
       this.onUserInteract = options.onUserInteract || null;
       this.onToggleFullscreen = options.onToggleFullscreen || null;
-      this.onToggleImmersive = options.onToggleImmersive || null;
-      this.getImmersive = options.getImmersive || (() => false);
 
       this.root = null;
       this.playPauseButton = null;
@@ -352,15 +350,12 @@
     _createWindowControls(parent) {
       const wrap = el('div', 'tm-window-controls');
 
-      // 沉浸：电视/画中画感；激活时为压缩箭头
-      const ICON_IMMERSIVE = `<svg class="tm-win-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="5" width="19" height="13" rx="2.2" stroke="currentColor" stroke-width="1.8"/><path d="M8 19.5h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
-      const ICON_IMMERSIVE_EXIT = `<svg class="tm-win-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="5" width="19" height="13" rx="2.2" stroke="currentColor" stroke-width="1.8"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`;
       // 进入全屏：四角向外
       const ICON_FS_ENTER = `<svg class="tm-win-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
       // 退出全屏：四角向内（标准 compress）
       const ICON_FS_EXIT = `<svg class="tm-win-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 3v5H3M16 3v5h5M8 21v-5H3M21 16h-5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-      this._icons = { ICON_IMMERSIVE, ICON_IMMERSIVE_EXIT, ICON_FS_ENTER, ICON_FS_EXIT };
+      this._icons = { ICON_FS_ENTER, ICON_FS_EXIT };
 
       // 截动图(GIF):按时间段生成动图,懒加载模块 gif-capture.js
       const gifBtn = el('button', 'tm-control-button tm-window-btn');
@@ -376,26 +371,12 @@
         if (typeof this.onUserInteract === 'function') this.onUserInteract();
       });
 
-      const immersiveBtn = el('button', 'tm-control-button tm-window-btn');
-      immersiveBtn.type = 'button';
-      immersiveBtn.innerHTML = ICON_IMMERSIVE;
-
       const fsBtn = el('button', 'tm-control-button tm-window-btn');
       fsBtn.type = 'button';
       fsBtn.innerHTML = ICON_FS_ENTER;
 
-      this.immersiveButton = immersiveBtn;
       this.fullscreenButton = fsBtn;
 
-      this._on(immersiveBtn, 'click', (e) => {
-        e.stopPropagation();
-        if (typeof this.onToggleImmersive === 'function') this.onToggleImmersive();
-        // 状态可能异步变化，稍后再刷一次
-        this.updateWindowButtons();
-        setTimeout(() => this.updateWindowButtons(), 80);
-        this.show({ autoHide: false });
-        if (typeof this.onUserInteract === 'function') this.onUserInteract();
-      });
       this._on(fsBtn, 'click', (e) => {
         e.stopPropagation();
         if (typeof this.onToggleFullscreen === 'function') this.onToggleFullscreen();
@@ -405,7 +386,7 @@
         if (typeof this.onUserInteract === 'function') this.onUserInteract();
       });
 
-      wrap.append(gifBtn, immersiveBtn, fsBtn);
+      wrap.append(gifBtn, fsBtn);
       parent.appendChild(wrap);
       this.updateWindowButtons();
     }
@@ -418,16 +399,9 @@
     }
 
     updateWindowButtons() {
-      const immersive = !!(typeof this.getImmersive === 'function' && this.getImmersive());
       const fullscreen = this._isFullscreen();
       const ic = this._icons || {};
 
-      if (this.immersiveButton) {
-        this.immersiveButton.classList.toggle('is-active', immersive);
-        this.immersiveButton.title = immersive ? '退出沉浸观看' : '沉浸观看';
-        this.immersiveButton.setAttribute('aria-label', immersive ? '退出沉浸观看' : '沉浸观看');
-        this.immersiveButton.innerHTML = immersive ? ic.ICON_IMMERSIVE_EXIT : ic.ICON_IMMERSIVE;
-      }
       if (this.fullscreenButton) {
         this.fullscreenButton.classList.toggle('is-active', fullscreen);
         this.fullscreenButton.classList.toggle('is-fullscreen', fullscreen);

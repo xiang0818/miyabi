@@ -15,6 +15,8 @@ export type PlayerInstance = {
   prev: () => void
   seek: (seconds: number) => void
   stop: () => void
+  setControlsHidden: (hidden: boolean) => void
+  isControlsHidden: () => boolean
   destroy: () => void
 }
 
@@ -29,7 +31,7 @@ declare global {
 type PlayerStageProps = {
   poster?: string
   onReady?: (player: PlayerInstance) => void
-  onChange?: (index: number) => void
+  onChange?: (index: number, source: PlayerTrack) => void
   onEnded?: (index: number, hasNext: boolean) => void
   onProgress?: (currentTime: number, duration: number) => void
 }
@@ -56,7 +58,7 @@ export function PlayerStage(props: PlayerStageProps) {
         instance = window.MiyabiPlayer.create(hostRef.current, {
           sources: [],
           poster: current.poster,
-          onChange: (index: number) => current.onChange?.(index),
+          onChange: (index: number, source: PlayerTrack) => current.onChange?.(index, source),
           onEnded: (index: number, _source: unknown, hasNext: boolean) =>
             current.onEnded?.(index, hasNext),
           onProgress: (currentTime: number, duration: number) =>

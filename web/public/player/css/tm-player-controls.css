@@ -162,7 +162,7 @@
   pointer-events: auto !important;
 }
 
-/* Panel — 默认（非全屏/非沉浸）更紧凑 */
+/* Panel — 默认（非全屏）更紧凑 */
 .tm-control-host .tm-control-buttons,
 .tm-control-buttons {
   position: relative !important;
@@ -192,11 +192,11 @@
 }
 
 /* 普通窗口：再压一点高度与密度 */
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-control-host {
+.video-container:not(.fullscreen-active) .tm-control-host {
   padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-control-host .tm-control-buttons {
+.video-container:not(.fullscreen-active) .tm-control-host .tm-control-buttons {
   width: min(100%, 480px) !important;
   max-width: min(100%, 480px) !important;
   gap: 2px;
@@ -204,73 +204,73 @@ body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-control-h
   border-radius: 9px !important;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-playback-control-row {
+.video-container:not(.fullscreen-active) .tm-playback-control-row {
   height: 26px;
   min-height: 26px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-time-control-button {
+.video-container:not(.fullscreen-active) .tm-time-control-button {
   height: 22px;
   min-height: 22px;
   padding: 0 4px;
   font-size: 9px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-start-time-container,
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-end-time-container,
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-loop-toggle-button {
+.video-container:not(.fullscreen-active) .tm-start-time-container,
+.video-container:not(.fullscreen-active) .tm-end-time-container,
+.video-container:not(.fullscreen-active) .tm-loop-toggle-button {
   height: 22px;
   min-height: 22px;
   padding: 0 5px;
   font-size: 10px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-control-button {
+.video-container:not(.fullscreen-active) .tm-control-button {
   width: 26px;
   height: 26px;
   min-width: 26px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-control-button svg {
+.video-container:not(.fullscreen-active) .tm-control-button svg {
   width: 14px;
   height: 14px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-playback-rate-slider {
+.video-container:not(.fullscreen-active) .tm-playback-rate-slider {
   min-width: 96px;
   max-width: 120px;
   height: 24px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-window-controls {
+.video-container:not(.fullscreen-active) .tm-window-controls {
   height: 24px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-window-controls .tm-window-btn {
+.video-container:not(.fullscreen-active) .tm-window-controls .tm-window-btn {
   width: 22px;
   height: 22px;
   min-width: 22px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-slider-container {
+.video-container:not(.fullscreen-active) .tm-slider-container {
   height: 20px;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-current-time,
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-total-duration {
+.video-container:not(.fullscreen-active) .tm-current-time,
+.video-container:not(.fullscreen-active) .tm-total-duration {
   font-size: 9px;
 }
 
 /* 普通窗口隐藏 ±10m，避免菜单过宽 */
-body:not(.immersive-mode) .video-container:not(.fullscreen-active)
+.video-container:not(.fullscreen-active)
   .tm-rewind-buttons-container .tm-time-control-button:last-child,
-body:not(.immersive-mode) .video-container:not(.fullscreen-active)
+.video-container:not(.fullscreen-active)
   .tm-forward-buttons-container .tm-time-control-button:last-child {
   display: none;
 }
 
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) .tm-chrome-actions,
-body:not(.immersive-mode) .video-container:not(.fullscreen-active) ~ .tm-chrome-actions {
+.video-container:not(.fullscreen-active) .tm-chrome-actions,
+.video-container:not(.fullscreen-active) ~ .tm-chrome-actions {
   /* no-op placeholder for cascade clarity */
 }
 
@@ -356,18 +356,6 @@ body:not(.immersive-mode) .video-container:not(.fullscreen-active) ~ .tm-chrome-
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
-}
-
-/* 沉浸：介于普通与全屏之间，贴视频底边居中 */
-body.immersive-mode .tm-control-host {
-  padding: 0 clamp(12px, 2.5vw, 24px) calc(10px + env(safe-area-inset-bottom, 0px));
-}
-
-body.immersive-mode .tm-control-host .tm-control-buttons {
-  width: min(100%, 640px) !important;
-  max-width: min(100%, 640px) !important;
-  gap: 4px;
-  padding: 6px 8px !important;
 }
 
 /* Rows */
@@ -693,7 +681,7 @@ body.immersive-mode .tm-control-host .tm-control-buttons {
 .tm-center-controls { flex: 0 0 auto; justify-content: center; }
 .tm-right-controls { flex: 1; justify-content: flex-end; }
 
-/* Immersive + fullscreen — left of speed */
+/* 截动图 / 全屏 按钮组 — 倍速左侧 */
 .tm-window-controls {
   display: inline-flex;
   align-items: center;
@@ -1076,7 +1064,7 @@ body.immersive-mode .tm-control-host .tm-control-buttons {
   height: 40px !important;
 }
 
-/* Corner chrome: fullscreen / immersive */
+/* Corner chrome: fullscreen */
 .tm-chrome-actions {
   position: absolute;
   top: 8px;
@@ -1208,7 +1196,7 @@ body.immersive-mode .tm-control-host .tm-control-buttons {
     display: none;
   }
 
-  /* 播放行防重叠:左右区不弹性拉伸、右区贴右,避免窗口按钮(GIF/沉浸/全屏)
+  /* 播放行防重叠:左右区不弹性拉伸、右区贴右,避免窗口按钮(GIF/全屏)
      侵入中间播放/暂停键 */
   .tm-left-controls,
   .tm-right-controls {

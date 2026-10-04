@@ -57,6 +57,7 @@
     var hls = null;
     var xg = null;
     var destroyed = false;
+    var controlsHidden = false;
 
     function activeVideo() {
       if (xg && xg.video) return xg.video;
@@ -70,8 +71,6 @@
         videoWrapper: stage,
         getVideo: activeVideo,
         onToggleFullscreen: function () { toggleFullscreen(); },
-        onToggleImmersive: function () { setImmersive(!container.classList.contains('is-immersive')); },
-        getImmersive: function () { return container.classList.contains('is-immersive'); },
         onCaptureGif: function () {
           if (typeof global.openGifCapture === 'function') global.openGifCapture();
         }
@@ -158,13 +157,17 @@
       }
     }
 
-    function setImmersive(on) {
-      container.classList.toggle('is-immersive', !!on);
-      if (options.onImmersiveChange) options.onImmersiveChange(!!on);
-    }
-
     video.addEventListener('timeupdate', function () {
       if (options.onProgress) options.onProgress(video.currentTime, video.duration);
+    });
+
+    // Clicking the picture toggles play/pause even while the control panel is collapsed.
+    stage.addEventListener('click', function (event) {
+      if (event.target.closest('#tmControlHost, button, input, a')) return;
+      var v = activeVideo();
+      if (!v) return;
+      if (v.paused) v.play().catch(function () {});
+      else v.pause();
     });
 
     if (list.length) loadAt(Number.isInteger(options.startIndex) ? options.startIndex : 0);
@@ -186,14 +189,19 @@
         if (Array.isArray(sources)) list = sources.slice();
       },
       stop: function () { teardownEngine(); },
-      setImmersive: setImmersive,
+      setControlsHidden: function (hidden) {
+        controlsHidden = !!hidden;
+        controlHost.style.display = controlsHidden ? 'none' : '';
+        if (!controlsHidden && controls) controls.show({ autoHide: false });
+      },
+      isControlsHidden: function () { return controlsHidden; },
       toggleFullscreen: toggleFullscreen,
       destroy: function () {
         if (destroyed) return;
         destroyed = true;
         teardownEngine();
         if (controls && typeof controls.destroy === 'function') controls.destroy();
-        container.classList.remove('miyabi-player', 'is-immersive');
+        container.classList.remove('miyabi-player');
         container.innerHTML = '';
       }
     };

@@ -2,7 +2,7 @@
 
 用途：Miyabi 内置播放器的静态资源与播放内核（Vite 打包到 `dist/player`，后端静态服务直接提供）。
 
-## 来源（从仓库根 `player/` 拷贝，根目录仅作参考源，不进构建/提交）
+## 来源（由原始 `player/` 参考实现拷贝而来；该参考目录已移除，本目录为唯一真源）
 - `js/`：`xgplayer.min.js`、`xgplayer-flv.min.js`、`hls.min.js`、`tm-player-controls.js`、`gifenc.min.js`、`gif-capture.js`
 - `css/`：`xgplayer.min.css`、`font-awesome.min.css`、`tm-player-controls.css`
 - `webfonts/`：Font Awesome 字体
@@ -12,10 +12,12 @@
 ## 新增
 - `js/player-core.js`：从 `player.html` 的 `playCore`/`setupPlayerEvents` 抽出的框架无关内核。
   - 工厂：`MiyabiPlayer.create(container, { sources, poster, startIndex, continueOnEnded, onChange, onEnded, onProgress })`
-  - 实例：`play / pause / seek / next / prev / hasNext / hasPrev / current / setSources / setQueue / stop / setImmersive / toggleFullscreen / destroy`
+  - 实例：`play / pause / seek / next / prev / hasNext / hasPrev / current / setSources / setQueue / stop / setControlsHidden / isControlsHidden / toggleFullscreen / destroy`
+  - `setControlsHidden(hidden)`：隐藏 / 显示 `#tmControlHost`（隐藏用 `display:none`，显示时 `controls.show({ autoHide:false })`）；隐藏态下点击画面切换播放 / 暂停。
   - 路由：flv/mkv→xgplayer，m3u8→hls.js，其余→原生 video；统一挂 `TmPlayerControls`。
   - 约定：原生 video `id=videoPlayer`，xgplayer 容器 `id=xgplayerContainer`——`gif-capture.js` 依赖这两个选择器。
   - 保留 GIF 截动图；丢弃拖拽、笔记/标签、文件目录树、player 自带历史。
+  - 移除：`TmPlayerControls` 的沉浸模式（按钮 / `onToggleImmersive` / `getImmersive` / `setImmersive` / `is-immersive` 类及 `body.immersive-mode` CSS）。原实现容器加 `is-immersive`，与 CSS 的 `body.immersive-mode` 不匹配，功能一直失效；现仅保留普通与全屏两态。
 
 ## 验证
 `node --check js/player-core.js`；资源经 `pnpm build` 内联到 `dist/player/**`，由后端 `installFrontend` 提供。

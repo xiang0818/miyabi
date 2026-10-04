@@ -31,7 +31,8 @@ export type PlayablePage = {
 
 export const playableKeys = {
   all: ['playables'] as const,
-  page: (scope: string, directory: string) => ['playables', scope, directory] as const
+  page: (scope: string, directory: string, query: string) =>
+    ['playables', scope, directory, query] as const
 }
 
 export function playableVideoUrl(kind: PlayableKind, fileID: string): string {
@@ -39,14 +40,14 @@ export function playableVideoUrl(kind: PlayableKind, fileID: string): string {
   return path + encodeURIComponent(fileID)
 }
 
-export function usePlayables(scope: PlayableKind, directory: string) {
+export function usePlayables(scope: PlayableKind, directory: string, query: string) {
   return useInfiniteQuery({
-    queryKey: playableKeys.page(scope, directory),
+    queryKey: playableKeys.page(scope, directory, query),
     initialPageParam: 1,
     queryFn: ({ pageParam, signal }) =>
       apiGet<PlayablePage>(
         '/api/playables',
-        { scope, directory, page: pageParam, limit: PLAYABLE_PAGE_SIZE },
+        { scope, directory, q: query, page: pageParam, limit: PLAYABLE_PAGE_SIZE },
         signal
       ),
     getNextPageParam: last => (last.has_more ? last.page + 1 : undefined)

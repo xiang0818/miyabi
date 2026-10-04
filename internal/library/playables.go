@@ -3,6 +3,7 @@ package library
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/ppxb/miyabi/internal/database"
 	"github.com/ppxb/miyabi/internal/domain"
@@ -45,7 +46,7 @@ type PlayablePage struct {
 // Playables lists the movies a player can open for one source scope. Local
 // scope can be narrowed to a configured root; remote scope uses the mounted
 // library source; favorites is reserved and returns nothing for now.
-func (s *Service) Playables(ctx context.Context, scope, directory string, page, limit int) (PlayablePage, error) {
+func (s *Service) Playables(ctx context.Context, scope, directory, query string, page, limit int) (PlayablePage, error) {
 	result := PlayablePage{Items: []Playable{}, Page: page}
 	if page < 1 {
 		page, result.Page = 1, 1
@@ -78,7 +79,11 @@ func (s *Service) Playables(ctx context.Context, scope, directory string, page, 
 		return result, domain.E(domain.KindInvalid, "未知的播放来源", nil)
 	}
 
-	ids, err := s.database.Movie.Query().Where(movie.HasFilesWith(scopePred)).
+	filters := []predicate.Movie{movie.HasFilesWith(scopePred)}
+	if term := strings.TrimSpace(query); term != "" {
+		filters = append(filters, movie.Or(movie.CodeContainsFold(term), movie.TitleContainsFold(term)))
+	}
+	ids, err := s.database.Movie.Query().Where(filters...).
 		Order(ent.Desc(movie.FieldCreatedAt), ent.Desc(movie.FieldID)).
 		Offset((page - 1) * limit).Limit(limit + 1).IDs(ctx)
 	if err != nil {
