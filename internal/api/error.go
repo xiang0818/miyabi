@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"net/http"
+	"runtime/debug"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ppxb/miyabi/internal/domain"
@@ -106,29 +107,10 @@ func errorMiddleware(logger *slog.Logger) gin.HandlerFunc {
 			return
 		}
 
-		status, kind := mapErrorStatus(err)
+		status, _ := mapErrorStatus(err)
 		message := domain.PublicMessage(err)
 		if status == http.StatusNotFound && message == "内部服务错误" {
 			message = "资源不存在"
-		}
-
-		attrs := []any{
-			"method", c.Request.Method,
-			"path", c.Request.URL.Path,
-			"status", status,
-			"kind", kind.String(),
-			"id", sloggin.GetRequestID(c),
-			"error", err.Error(),
-		}
-		var de *domain.Error
-		if errors.As(err, &de) && de.Cause != nil {
-			attrs = append(attrs, "cause", de.Cause.Error())
-		}
-
-		if status >= http.StatusInternalServerError {
-			logger.ErrorContext(c.Request.Context(), "request failed", attrs...)
-		} else {
-			logger.WarnContext(c.Request.Context(), "request failed", attrs...)
 		}
 
 		body := gin.H{"error": message}
@@ -145,11 +127,14 @@ func errorMiddleware(logger *slog.Logger) gin.HandlerFunc {
 }
 
 func recoveryMiddleware(logger *slog.Logger) gin.HandlerFunc {
-	return gin.CustomRecovery(func(c *gin.Context, recovered any) {
+	// Suppress Gin's raw panic/request dump; emit one sanitized diagnostic instead.
+	return gin.CustomRecoveryWithWriter(nil, func(c *gin.Context, recovered any) {
 		logger.ErrorContext(c.Request.Context(), "request panicked",
 			"method", c.Request.Method,
 			"path", c.Request.URL.Path,
-			"error", fmt.Sprint(recovered),
+			"id", sloggin.GetRequestID(c),
+			"error", redactLogURLs(fmt.Sprint(recovered)),
+			"stack", string(debug.Stack()),
 		)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 	})
