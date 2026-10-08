@@ -46,6 +46,7 @@ try {
 
     Copy-Item LICENSE $stage
     Copy-Item docs/portable-windows.md (Join-Path $stage '使用说明.md')
+    Copy-Item scripts/start-portable.bat (Join-Path $stage '启动.bat')
     Copy-Item scripts/stop-portable.bat (Join-Path $stage '停止.bat')
 
     if (Test-Path $zip) { Remove-Item -Force $zip }
