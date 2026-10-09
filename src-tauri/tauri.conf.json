@@ -22,7 +22,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": ["binaries/miyabi"],
+    "externalBin": ["binaries/miyabi-server"],
     "windows": {
       "webviewInstallMode": {
         "type": "embedBootstrapper"

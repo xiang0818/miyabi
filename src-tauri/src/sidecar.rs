@@ -20,7 +20,7 @@ pub fn local_url() -> String {
     format!("http://127.0.0.1:{port}")
 }
 
-/// Spawns `miyabi` on a free loopback port and blocks until it is reachable.
+/// Spawns `miyabi-server` on a free loopback port and blocks until reachable.
 pub fn start(app: &App) -> Result<(), Box<dyn std::error::Error>> {
     let port = free_port()?;
     *PORT.lock().expect("port lock") = port;
@@ -30,7 +30,7 @@ pub fn start(app: &App) -> Result<(), Box<dyn std::error::Error>> {
 
     let (mut events, child) = app
         .shell()
-        .sidecar("miyabi")?
+        .sidecar("miyabi-server")?
         .env("MIYABI_LISTEN", format!("127.0.0.1:{port}"))
         .env("MIYABI_DATA_DIR", data_dir.to_string_lossy().to_string())
         .spawn()?;

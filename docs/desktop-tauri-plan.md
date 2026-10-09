@@ -35,11 +35,11 @@
 ```
 ┌──────────────────────────── Tauri 应用 (miyabi desktop) ───────────────────────────┐
 │  Rust shell (src-tauri/)                                                            │
-│    ├─ 启动 sidecar: miyabi.exe  (env: MIYABI_LISTEN / MIYABI_DATA_DIR)              │
+│    ├─ 启动 sidecar: miyabi-server.exe  (env: MIYABI_LISTEN / MIYABI_DATA_DIR)              │
 │    ├─ 轮询 http://127.0.0.1:<port>/api/health                                       │
 │    └─ WebviewWindow(WebviewUrl::External("http://127.0.0.1:<port>"))                │
 │                                                                                     │
-│  sidecar 进程 (miyabi.exe)                                                          │
+│  sidecar 进程 (miyabi-server.exe)                                                          │
 │    └─ 内嵌 React 前端 + Go API（原样，未修改）                                       │
 └─────────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -80,7 +80,7 @@ docs/desktop-tauri-plan.md       # 本文
 
 | 契约 | 取值 / 位置 |
 |---|---|
-| 可执行名 | `miyabi`（Windows `miyabi.exe`） |
+| 可执行名 | `miyabi-server`（Windows `miyabi-server.exe`；**故意不叫 `miyabi`，避免与壳 `Miyabi.exe` 在 Windows 大小写不敏感下重名**） |
 | 监听地址 | 环境变量 `MIYABI_LISTEN`（默认 `:8080`），见 `internal/config/config.go:54` |
 | 数据目录 | 环境变量 `MIYABI_DATA_DIR`，见 `internal/config/config.go:55` |
 | 便携配置 | exe 同目录 `miyabi.env`，见 `internal/config/portable.go` |
@@ -102,7 +102,7 @@ docs/desktop-tauri-plan.md       # 本文
 - Tauri `externalBin` 要求文件名带三元组：
   ```powershell
   $triple = (rustc -vV | Select-String 'host:').ToString().Split()[-1]
-  go build -tags prod -o "src-tauri/binaries/miyabi-$triple.exe" ./cmd/miyabi
+  go build -tags prod -o "src-tauri/binaries/miyabi-server-$triple.exe" ./cmd/miyabi
   ```
 - 说明：Go 端**不需要改动**；如需隐藏控制台窗口可用 `-ldflags "-H windowsgui"`（由构建脚本决定，不动源码）。
 
@@ -113,7 +113,7 @@ docs/desktop-tauri-plan.md       # 本文
     "productName": "Miyabi",
     "identifier": "com.ppxb.miyabi.desktop",
     "bundle": {
-      "externalBin": ["binaries/miyabi"],
+      "externalBin": ["binaries/miyabi-server"],
       "windows": { "webviewInstallMode": { "type": "embedBootstrapper" } }
     },
     "build": { "frontendDist": "stub" }   // UI 由 Go 提供，仅需最小占位
@@ -124,7 +124,7 @@ docs/desktop-tauri-plan.md       # 本文
 
 ### 5.4 启动 / 就绪 / 退出（`src-tauri/src/main.rs` + `sidecar.rs`）
 1. `setup`：
-   - 选端口（见 §6），`Command::new_sidecar("miyabi")`，注入 `MIYABI_LISTEN`、`MIYABI_DATA_DIR`，spawn。
+   - 选端口（见 §6），`Command::new_sidecar("miyabi-server")`，注入 `MIYABI_LISTEN`、`MIYABI_DATA_DIR`，spawn。
    - 轮询 `http://127.0.0.1:<port>/api/health`，带超时（如 30s）；失败弹原生错误并退出。
    - 通过后 `WebviewWindowBuilder::new(app, "main", WebviewUrl::External(url))` 建窗。
 2. 退出：监听 `RunEvent::ExitRequested` / 主窗口 `Destroyed` → 结束 sidecar（Windows 建议用 Job Object 保证子进程随父进程退出，避免残留）。
@@ -137,7 +137,7 @@ docs/desktop-tauri-plan.md       # 本文
 
 ### 5.6 构建与运行
 - **安装包**：`tauri build` → Windows **NSIS 安装包**（sidecar 一并打入）。
-- **便携版**：不安装，直接跑的 zip = `Miyabi.exe`（壳）+ `miyabi.exe`（Go sidecar，必须与壳同目录）+ `LICENSE` + `使用说明.md`。
+- **便携版**：不安装，直接跑的 zip = `Miyabi.exe`（壳）+ `miyabi-server.exe`（Go sidecar，必须与壳同目录）+ `LICENSE` + `使用说明.md`。
 - 本地一键：`scripts/build-desktop.ps1`（本机需 Rust）；或交给 CI。
 - dev 预览需本机 Rust：先 `pnpm --dir web build`（内嵌前端），再编 sidecar，最后 `pnpm dlx @tauri-apps/cli@^2 dev`。本项目不做本地调试，故不提供 dev 脚本。
 

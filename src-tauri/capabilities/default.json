@@ -7,7 +7,7 @@
     "core:default",
     {
       "identifier": "shell:allow-execute",
-      "allow": [{ "name": "miyabi", "sidecar": true, "args": true }]
+      "allow": [{ "name": "miyabi-server", "sidecar": true, "args": true }]
     }
   ]
 }

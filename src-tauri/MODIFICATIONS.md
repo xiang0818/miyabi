@@ -8,7 +8,7 @@
 
 ## 文件
 - `Cargo.toml` / `build.rs`：Tauri v2 依赖与构建脚本。
-- `tauri.conf.json`：`bundle.externalBin = ["binaries/miyabi"]`、Windows `webviewInstallMode=embedBootstrapper`、`frontendDist=stub`（真实 UI 由 Go 提供）。
+- `tauri.conf.json`：`bundle.externalBin = ["binaries/miyabi-server"]`（sidecar 取名 `miyabi-server`，避免与壳 `Miyabi.exe` 在 Windows 大小写不敏感下重名覆盖）、Windows `webviewInstallMode=embedBootstrapper`、`frontendDist=stub`（真实 UI 由 Go 提供）。
 - `capabilities/default.json`：给 `main` 窗口 `shell:allow-execute`（sidecar 作用域）。
 - `src/main.rs`：Builder + 插件 + setup 启 sidecar/开窗 + 退出回收。
 - `src/sidecar.rs`：**唯一的上游契约适配点**——选空闲端口、起 sidecar（`MIYABI_LISTEN`/`MIYABI_DATA_DIR`）、TCP 就绪等待、退出 kill。
@@ -17,7 +17,7 @@
 - `.gitignore`：忽略 `target/`、`gen/`、`binaries/`、`icons/`、`app-icon.png`。
 
 ## 与上游耦合点（集中在 `src/sidecar.rs`）
-- 可执行名 `miyabi`；环境变量 `MIYABI_LISTEN` / `MIYABI_DATA_DIR`；就绪判据（TCP 连通，可选升级为 `GET /api/health`）。
+- 可执行名 `miyabi-server`；环境变量 `MIYABI_LISTEN` / `MIYABI_DATA_DIR`（设置任一即令 Go 端退出“便携模式”，从而**不会拉起浏览器**）；就绪判据（TCP 连通，可选升级为 `GET /api/health`）。
 
 ## 状态
 - M1/M2 骨架：代码已落，**待 CI（GitHub Actions）首次构建验证**（本地未装 Rust）。
