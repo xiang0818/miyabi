@@ -1,0 +1,10 @@
+# Rust / Tauri build output
+/target/
+/gen/
+
+# Go sidecar binary (built by scripts/build-desktop.ps1 or CI)
+/binaries/
+
+# Icons are generated from app-icon.png via `tauri icon`
+/icons/
+/app-icon.png
