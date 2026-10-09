@@ -145,7 +145,8 @@ docs/desktop-tauri-plan.md       # 本文
 `.github/workflows/desktop-tauri.yml`（名称 `Build desktop (Tauri)`，与 `Build Windows portable`、`Publish Miyabi image` 明显区分）：
 - 触发：`workflow_dispatch`（带 `version` 输入）、`feat/desktop-*` 分支推送、`v*.*.*` tag。
 - 步骤：装 Go/Rust/Node → 建前端（`web build`，供 `go:embed`）→ 建 Go sidecar（triple 命名）→ `tauri icon` → `tauri build`。
-- 产物：`miyabi-desktop-<version>-setup.exe`（NSIS 安装包）+ `miyabi-desktop-<version>-windows-x86_64.zip`（便携）→ 上传 artifact；tag 时附加到 Release。
+- 产物：`miyabi-desktop-<version>-setup.exe`（NSIS 安装包）+ `miyabi-desktop-<version>-windows-x86_64.zip`（便携），**各自独立**。
+- 上传：分成两个 artifact（`...-setup` / `...-portable`；注意 artifact 在 GitHub 侧一律以 zip 呈现，名字不带扩展名）；tag 时以**原始文件**（.exe / .zip 各带后缀）附加到 Release。
 
 ---
 

@@ -121,11 +121,19 @@ jobs:
           if (-not $nsis) { throw 'the NSIS installer was not produced' }
           Copy-Item $nsis.FullName "dist/miyabi-desktop-$env:VERSION-setup.exe"
 
-      - name: Upload packages
+      # 两个产物分开上传：安装包(.exe) 与 便携版(.zip) 各自一个 artifact。
+      - name: Upload installer
         uses: actions/upload-artifact@v4
         with:
-          name: miyabi-desktop-windows-x86_64
-          path: dist/*
+          name: miyabi-desktop-windows-x86_64-setup
+          path: dist/*-setup.exe
+          if-no-files-found: error
+
+      - name: Upload portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: miyabi-desktop-windows-x86_64-portable
+          path: dist/*.zip
           if-no-files-found: error
 
   publish:
@@ -139,7 +147,8 @@ jobs:
       - name: Download the packages
         uses: actions/download-artifact@v4
         with:
-          name: miyabi-desktop-windows-x86_64
+          pattern: miyabi-desktop-windows-x86_64-*
+          merge-multiple: true
           path: dist
 
       - name: Attach to the release
